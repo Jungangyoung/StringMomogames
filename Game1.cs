@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -15,6 +16,10 @@ namespace Karrot
         SpriteFont gameFont;
         Vector2 targetPosition = new Vector2(500, 200);
         const int targetRadius = 45;
+
+        MouseState mState;
+        bool mReleased = true;
+        int score = 0;
 
         public Game1()
         {
@@ -46,6 +51,28 @@ namespace Karrot
                 Exit();
 
             // TODO: Add your update logic here
+            mState = Mouse.GetState();
+
+            if (mState.LeftButton == ButtonState.Pressed && mReleased == true)
+            {
+                float mouseTargetaDist = Vector2.Distance(targetPosition, mState.Position.ToVector2());
+                if (mouseTargetaDist < targetRadius)
+                {
+                    score++;
+
+                    Random rand = new Random();
+
+                    targetPosition.X = rand.Next(0, _graphics.PreferredBackBufferWidth);
+                    targetPosition.Y = rand.Next(0, _graphics.PreferredBackBufferHeight);
+                }
+                
+                mReleased = false;
+            }
+
+            if (mState.LeftButton == ButtonState.Released)
+            {
+                mReleased = true;
+            }
 
             base.Update(gameTime);
         }
@@ -58,9 +85,9 @@ namespace Karrot
             _spriteBatch.Begin();
      
             _spriteBatch.Draw(backgroundSprite, new Vector2(0, 0), Color.White);
-            _spriteBatch.Draw(targetSprite, targetPosition, Color.White);
+            _spriteBatch.Draw(targetSprite, new Vector2(targetPosition.X - targetRadius, targetPosition.Y - targetRadius), Color.White);
 
-            _spriteBatch.DrawString(gameFont, "HalloWelt", new Vector2(300, 100), Color.White);
+            _spriteBatch.DrawString(gameFont, score.ToString() + " Hallo", new Vector2(300, 100), Color.White);
 
             _spriteBatch.End();
 
